@@ -351,10 +351,12 @@
             break
         self.setCursor(cursor)
         return found
+      elif isinstance(key, ( str, Key )):
+        return self.lookup(key)
       raise TypeError("Invalid argument type")
 
     def __contains__(self, item):
-      if isinstance(item, ( str, Key) ):
+      if isinstance(item, ( str, Key )):
         key = self._lookup(item)
         return True if key else False
       raise TypeError("Invalid argument type")
