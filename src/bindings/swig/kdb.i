@@ -2,7 +2,6 @@
 
 %include "attribute.i"
 %include "std_string.i"
-%ignore SwigPyIterator;
 %include "stl.i"
 %include "exception.i"
 
@@ -60,7 +59,6 @@
     KDB_CATCH_EX(kdb, KeyTypeMismatch) \
     KDB_CATCH_EX(kdb, KeyInvalidName) \
     KDB_CATCH_EX(kdb, KeyBadMeta) \
-    KDB_CATCH_EX(kdb, KeyNoSuchMeta) \
     KDB_CATCH_EX(kdb, KeyMetaException) \
     KDB_CATCH_EX(kdb, KeyException) \
     KDB_CATCH_EX(kdb, Exception)
@@ -102,6 +100,7 @@
 }
 
 // operator overloading sucks
+%ignore kdb::Key::operator->;
 %ignore kdb::Key::operator=;
 %ignore kdb::Key::operator+=;
 %ignore kdb::Key::operator-=;
@@ -174,6 +173,10 @@
 %ignore kdb::Key::operator--(int) const;
 %rename(_incRef) kdb::Key::operator++;
 %rename(_decRef) kdb::Key::operator--;
+
+// reference counted object
+//%feature("ref")   kdb::Key "$this->operator++();"
+//%feature("unref") kdb::Key "$this->operator--();"
 
 // name manipulation
 // we can't use %attribute here swig won't generate exception code for
@@ -311,9 +314,9 @@
 
 %rename(__len__) kdb::KeySet::size;
 
-%rename("_%s") kdb::KeySet::rewind;
-%rename("_%s") kdb::KeySet::next;
-%rename("_%s") kdb::KeySet::current;
+%ignore kdb::KeySet::rewind;
+%ignore kdb::KeySet::next;
+%ignore kdb::KeySet::current;
 
 %rename("_%s") kdb::KeySet::lookup;
 
@@ -326,13 +329,6 @@
     def lookup(self, *args):
       key = self._lookup(*args)
       return key if key else None
-
-    def __iter__(self):
-      self._rewind()
-      key = self._next()
-      while key:
-        yield key
-        key = self._next()
 
     def __getitem__(self, key):
       if isinstance(key, slice):
@@ -360,6 +356,41 @@
         key = self._lookup(item)
         return True if key else False
       raise TypeError("Invalid argument type")
+  }
+}
+
+// iterators
+// we hide all iterator classes. users should use python iter/reversed
+%ignore kdb::KeySetIterator;
+%ignore kdb::KeySetIterator::operator++;
+%ignore kdb::KeySetIterator::operator--;
+%ignore kdb::KeySetIterator::operator[];
+%ignore kdb::KeySetReverseIterator;
+%ignore kdb::KeySetReverseIterator::operator++;
+%ignore kdb::KeySetReverseIterator::operator--;
+%ignore kdb::KeySetReverseIterator::operator[];
+%ignore kdb::KeySet::begin;
+%ignore kdb::KeySet::end;
+%ignore kdb::KeySet::rbegin;
+%ignore kdb::KeySet::rend;
+%ignore kdb::KeySet::cbegin;
+%ignore kdb::KeySet::cend;
+%ignore kdb::KeySet::crbegin;
+%ignore kdb::KeySet::crend;
+
+// define traits needed by SwigPyIterator
+%fragment("SwigPyIterator_T");
+%traits_swigtype(kdb::Key);
+%fragment(SWIG_Traits_frag(kdb::Key));
+%extend kdb::KeySet {
+  swig::SwigPyIterator* __iter__(PyObject **PYTHON_SELF) {
+    return swig::make_output_iterator(self->begin(), self->begin(),
+      self->end(), *PYTHON_SELF);
+  }
+
+  swig::SwigPyIterator* __reversed__(PyObject **PYTHON_SELF) {
+    return swig::make_output_iterator(self->rbegin(), self->rbegin(),
+      self->rend(), *PYTHON_SELF);
   }
 }
 

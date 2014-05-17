@@ -14,7 +14,7 @@ set (CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_BINARY_DIR})
 set (CMAKE_SWIG_FLAGS "-O")
 
 set_source_files_properties (../kdb.i PROPERTIES CPLUSPLUS ON)
-set_source_files_properties (../kdb.i PROPERTIES SWIG_FLAGS "-py3")
+set_source_files_properties (../kdb.i PROPERTIES SWIG_FLAGS "-py3;-extranative")
 swig_add_module (kdb python ../kdb.i)
 swig_link_libraries(kdb elektra ${PYTHON_LIBRARIES})
 
