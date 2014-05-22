@@ -77,8 +77,8 @@
     SWIG_exception(SWIG_RuntimeError, e.what()); \
   } \
   catch (...) { \
-    SWIG_exception(SWIG_UnknownError, "unknown error in kdb::Key"); \
-  } \
+    SWIG_exception(SWIG_UnknownError, "unknown error in $decl"); \
+  }
 
 %exceptionclass kdb::Exception;
 %extend kdb::Exception {
@@ -151,13 +151,9 @@
       #TODO swig directors?
       raise TypeError("Unsupported meta type")
     elif arg == KEY_DIR:
-      mode = 0
-      try:
-        mode = int(self.getMeta("mode").value)
-      except KeyNoSuchMeta:
-        pass
-      mode |= 0o111;
-      self.setMeta("mode", "{0:o}".format(mode))
+      meta = self.getMeta("mode")
+      mode = int(meta.value, 8) if meta else 0
+      self.setMeta("mode", "{0:o}".format(mode | 0o111))
     elif arg == KEY_META:
       self.setMeta(next(args), next(args))
     elif arg == KEY_NULL:
@@ -252,7 +248,7 @@
 
     def getMeta(self, *args):
       if len(args):
-        return self._getMeta(args[0])
+        return self._getMeta(*args)
       return self.__metaIter()
 
     def setMeta(self, name, value):
@@ -262,10 +258,10 @@
 
     def __metaIter(self):
       self._rewindMeta()
-      key = self._nextMeta()
-      while key:
-        yield key
-        key = self._nextMeta()
+      meta = self._nextMeta()
+      while meta:
+        yield meta
+        meta = self._nextMeta()
 
     name     = property(_kdb.Key__getName, _kdb.Key__setName)
     value    = property(get, set, None, "Key value")
