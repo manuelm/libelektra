@@ -201,7 +201,7 @@ private:
 inline Key::Key () :
 	key(ckdb::keyNew (0))
 {
-	operator++(); 
+	operator++();
 }
 
 /**
@@ -217,7 +217,7 @@ inline Key::Key () :
 inline Key::Key (ckdb::Key * k) :
 	key(k)
 {
-	operator++(); 
+	operator++();
 }
 
 /**
