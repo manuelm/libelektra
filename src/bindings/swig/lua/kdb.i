@@ -458,35 +458,6 @@
     return not key:isNull() and key or nil
   end
 
-  -- iterators
-  mt[".fn"]["iter"] = function(self)
-     return coroutine.wrap(
-      function()
-        local it = self:begin()
-        local key = it:get()
-        while not key:isNull() do
-          coroutine.yield(key)
-          it:inc()
-          key = it:get()
-        end
-      end
-    )
-  end
-
-  mt[".fn"]["riter"] = function(self)
-     return coroutine.wrap(
-      function()
-        local it = self:rbegin()
-        local key = it:get()
-        while not key:isNull() do
-          coroutine.yield(key)
-          it:inc()
-          key = it:get()
-        end
-      end
-    )
-  end
-
   -- table-like key lookup
   -- NOTE: this also returns all available class methods
   -- e.g. ks["lookup"] will return above function
@@ -497,46 +468,13 @@
       return val
     end
 
-    if type(prop) == "number" then
-      -- kinda hack but works
-      local f, _, _ = ipairs(self)
-      local _, k = f(self, prop)
-      return k
-    end
     return self:lookup(prop)
   end
 %}
 
 // iterators
 // we hide all iterator classes. users should use pairs/ipairs
-//%rename(inc) kdb::KeySetIterator::operator++;
-//%rename(dec) kdb::KeySetIterator::operator--;
-//%rename(inc) kdb::KeySetReverseIterator::operator++;
-//%rename(dec) kdb::KeySetReverseIterator::operator--;
-#if 1
-%ignore kdb::KeySetIterator;
-%ignore kdb::KeySetReverseIterator;
-%ignore kdb::KeySet::begin;
-%ignore kdb::KeySet::rbegin;
-#endif
-%ignore kdb::KeySet::end;
-%ignore kdb::KeySet::rend;
-%ignore kdb::KeySet::cbegin;
-%ignore kdb::KeySet::cend;
-%ignore kdb::KeySet::crbegin;
-%ignore kdb::KeySet::crend;
-%ignore kdb::operator==;
-%ignore kdb::operator!=;
-%ignore kdb::operator<;
-%ignore kdb::operator<=;
-%ignore kdb::operator>;
-%ignore kdb::operator>=;
-%ignore kdb::operator-;
-%ignore kdb::operator+;
-%ignore iterator;
-%ignore const_iterator;
-%ignore reverse_iterator;
-%ignore const_reverse_iterator;
+#define WITHOUT_KEYSET_ITERATOR
 
 %include "keyset.hpp"
 

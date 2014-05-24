@@ -329,21 +329,7 @@
     def __getitem__(self, key):
       if isinstance(key, slice):
         return [ self[k] for k in range(*key.indices(len(self))) ]
-      elif isinstance(key, int):
-        if key < 0:
-          key += len(self)
-        if key >= len(self):
-          raise IndexError("The index ({0}) is out of range".format(key))
-
-        cursor = self.getCursor()
-        found = None
-        for (n, k) in enumerate(self):
-          if n == key:
-            found = k
-            break
-        self.setCursor(cursor)
-        return found
-      elif isinstance(key, ( str, Key )):
+      elif isinstance(key, ( int, str, Key )):
         return self.lookup(key)
       raise TypeError("Invalid argument type")
 
@@ -357,22 +343,7 @@
 
 // iterators
 // we hide all iterator classes. users should use python iter/reversed
-%ignore kdb::KeySetIterator;
-%ignore kdb::KeySetIterator::operator++;
-%ignore kdb::KeySetIterator::operator--;
-%ignore kdb::KeySetIterator::operator[];
-%ignore kdb::KeySetReverseIterator;
-%ignore kdb::KeySetReverseIterator::operator++;
-%ignore kdb::KeySetReverseIterator::operator--;
-%ignore kdb::KeySetReverseIterator::operator[];
-%ignore kdb::KeySet::begin;
-%ignore kdb::KeySet::end;
-%ignore kdb::KeySet::rbegin;
-%ignore kdb::KeySet::rend;
-%ignore kdb::KeySet::cbegin;
-%ignore kdb::KeySet::cend;
-%ignore kdb::KeySet::crbegin;
-%ignore kdb::KeySet::crend;
+#define WITHOUT_KEYSET_ITERATOR
 
 // define traits needed by SwigPyIterator
 %fragment("SwigPyIterator_T");
