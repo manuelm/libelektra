@@ -241,6 +241,12 @@
           break
         elseif arg == kdb.KEY_NAME then
           i, key.name = next(t, i)
+        elseif arg == kdb.KEY_VALUE then
+          if key:isBinary() then
+            i, key.binary = next(t, i)
+          else
+            i, key.string = next(t, i)
+          end
         elseif arg == kdb.KEY_OWNER then
           i, arg = next(t, i)
           key:setMeta("owner", arg)
@@ -248,7 +254,7 @@
           i, arg = next(t, i)
           key:setMeta("comment", arg)
         elseif arg == kdb.KEY_BINARY then
-          -- nothing
+          key:setMeta("binary", "")
         elseif arg == kdb.KEY_UID then
           i, arg = next(t, i)
           key:setMeta("uid", tostring(arg))
@@ -444,7 +450,9 @@
     local ks = orig_call(t, alloc)
 
     if select("#", ...) > 0 then
-      for _, arg in pairs({...}) do
+      -- there's no need to check for KS_END
+      -- ipairs will do this for us
+      for _, arg in ipairs({...}) do
         ks:append(arg)
       end
     end

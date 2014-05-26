@@ -82,10 +82,10 @@
 
 %exceptionclass kdb::Exception;
 %extend kdb::Exception {
-  %pythoncode {
+  %pythoncode %{
     def __str__(self):
       return self.what()
-  }
+  %}
 }
 %include "keyexcept.hpp"
 %include "kdbexcept.hpp"
@@ -138,13 +138,13 @@
     elif arg == KEY_GID:
       self.setMeta("gid", str(next(args)))
     elif arg == KEY_MODE:
-      self.setMeta("mode", "{0:o}".format(next(args)))
+      self.setMeta("mode", "{0:o}".format(int(next(args))))
     elif arg == KEY_ATIME:
-      self.setMeta("atime", "{0:d}".format(next(args)))
+      self.setMeta("atime", "{0:d}".format(int(next(args))))
     elif arg == KEY_MTIME:
-      self.setMeta("mtime", "{0:d}".format(next(args)))
+      self.setMeta("mtime", "{0:d}".format(int(next(args))))
     elif arg == KEY_CTIME:
-      self.setMeta("ctime", "{0:d}".format(next(args)))
+      self.setMeta("ctime", "{0:d}".format(int(next(args))))
     elif arg == KEY_SIZE:
       pass
     elif arg == KEY_FUNC:
@@ -235,7 +235,7 @@
     return ckdb::keyCmp($self->getKey(), o->getKey());
   }
 
-  %pythoncode {
+  %pythoncode %{
     def get(self):
       if self.isBinary():
         return self._getBinary()
@@ -271,7 +271,7 @@
 
     def __str__(self):
       return self.name
-  }
+  %}
 };
 
 %include "key.hpp"
@@ -293,20 +293,19 @@
 %ignore kdb::KeySet::KeySet(size_t alloc, ...);
 %ignore kdb::KeySet::operator=;
 
-%pythonprepend kdb::KeySet::KeySet {
+%pythonprepend kdb::KeySet::KeySet %{
   orig = []
   if len(args):
     orig = args[1:]
     args = [ args[0] ]
-}
+%}
 
-%pythonappend kdb::KeySet::KeySet {
+%pythonappend kdb::KeySet::KeySet %{
   for arg in orig:
-    # check for KS_END
-    if arg is None:
+    if arg is KS_END:
       break
     self.append(arg)
-}
+%}
 
 %rename(__len__) kdb::KeySet::size;
 
@@ -321,7 +320,7 @@
    return new kdb::KeySet(alloc, KS_END);
   }
 
-  %pythoncode {
+  %pythoncode %{
     def lookup(self, *args):
       key = self._lookup(*args)
       return key if key else None
@@ -338,7 +337,7 @@
         key = self._lookup(item)
         return True if key else False
       raise TypeError("Invalid argument type")
-  }
+  %}
 }
 
 // iterators
@@ -370,6 +369,19 @@
 // exception handling for kdb::KDB
 %exception {
   KDB_CATCH(KDB_EXCEPTIONS)
+}
+
+%extend kdb::KDB {
+  %pythoncode %{
+    def __enter__(self):
+      return self
+
+    def __exit__(self, type, value, tb):
+      try:
+        self.close(Key())
+      except:
+        pass
+  %}
 }
 
 %include "kdb.hpp"

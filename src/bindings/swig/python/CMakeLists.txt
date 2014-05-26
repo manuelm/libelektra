@@ -27,5 +27,7 @@ install (
 	DESTINATION ${PYTHON_SITE_PACKAGES}
 )
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/swig/)
+include_directories (${CMAKE_CURRENT_SOURCE_DIR})
+include_directories (${CMAKE_SOURCE_DIR}/src/swig/)
+
+add_subdirectory (tests)
