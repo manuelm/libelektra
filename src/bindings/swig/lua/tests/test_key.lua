@@ -111,6 +111,7 @@ assert(key:getMeta("mtime").value   == "456")
 assert(key:getMeta("ctime").value   == "789")
 assert(key:getMeta("by").value      == "manuel")
 
+assert(key:hasMeta("doesnt_exist") == false)
 assert(key:getMeta("doesnt_exist"):isNull() == true)
 assert(bkey:getMeta("binary"):isNull() == false)
 assert(bkey:getMeta("owner"):isNull() == true)

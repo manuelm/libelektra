@@ -111,6 +111,7 @@ class Key(unittest.TestCase):
 		self.assertEqual(self.key.getMeta("ctime").value,   "789")
 		self.assertEqual(self.key.getMeta("by").value,      "manuel")
 
+		self.assertFalse(self.key.hasMeta("doesnt_exist"))
 		self.assertFalse(bool(self.key.getMeta("doesnt_exist")))
 		self.assertTrue(bool(self.bkey.getMeta("binary")))
 		self.assertFalse(bool(self.bkey.getMeta("owner")))

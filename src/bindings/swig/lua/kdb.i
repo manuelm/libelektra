@@ -237,6 +237,7 @@
 %rename("_%s") kdb::KeySet::current;
 
 %rename("_%s") kdb::KeySet::lookup;
+%rename("_lookup") kdb::KeySet::at;
 
 %extend kdb::KeySet {
   KeySet(size_t alloc) {

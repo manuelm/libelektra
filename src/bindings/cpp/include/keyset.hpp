@@ -69,7 +69,7 @@ public:
 
 	Key lookup (const Key &k, const option_t options = KDB_O_NONE) const;
 	Key lookup (std::string const & name, const option_t options = KDB_O_NONE) const;
-	Key lookup (cursor_t pos) const;
+	Key at (cursor_t pos) const;
 
 #ifndef WITHOUT_KEYSET_ITERATOR
 	typedef KeySetIterator iterator;
@@ -663,7 +663,7 @@ inline Key KeySet::lookup (std::string const & name, option_t const options) con
  *
  * @return the found key
  */
-inline Key KeySet::lookup (cursor_t pos) const
+inline Key KeySet::at (cursor_t pos) const
 {
 	if (pos < 0)
 		pos += size();
