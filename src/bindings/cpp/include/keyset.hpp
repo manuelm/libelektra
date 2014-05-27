@@ -335,7 +335,6 @@ inline KeySet::const_reverse_iterator KeySet::crend() const noexcept
 	return KeySet::const_reverse_iterator(*this, -1);
 }
 #endif
-
 #endif //WITHOUT_KEYSET_ITERATOR
 
 
